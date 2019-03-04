@@ -14,6 +14,8 @@ void testPLAN(uint16_t fractional_bits, bool writeFile);
 void testA_LAW(uint16_t fractional_bits, bool writeFile);
 void testALIPPI(uint16_t fractional_bits, bool writeFile);
 void testIterative(int q, uint16_t fractional_bits, bool writeFile);
+double absolute_error(double precise, double approximate);
+double relative_error(double precise, double approximate);
 
 int main() {
     /*basicExamples();
@@ -141,8 +143,10 @@ double sigmoid(double x){
 void testPLAN(uint16_t fractional_bits, bool writeFile){
     printf("PLAN approximation test...\n");
     ofstream file;
+    ofstream file2;
     if(writeFile) {
         file.open("PLAN_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("PLAN_relative_without_rounding" + to_string(fractional_bits) + ".txt");
     }
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
@@ -159,7 +163,8 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
         double precise = sigmoid(i);
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
-        double abs_error = abs(result - precise);
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
         if(abs_error > max_abs_error){
             max_abs_error = abs_error;
             /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
@@ -167,7 +172,8 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
         }
 
         if(writeFile) {
-            file << i << "," << result << endl;
+            file<<i<< "," << result << endl;
+            file2<<i<<","<<rel_error<<endl;
         }
 
         sum += abs_error;
@@ -179,6 +185,7 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
     if(writeFile) {
         file.close();
+        file2.close();
     }
 }
 
@@ -188,8 +195,10 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
+    ofstream file2;
     if(writeFile) {
         file.open("A_LAW_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("A_LAW_relative_without_rounding" + to_string(fractional_bits) + ".txt");
     }
 
 
@@ -204,7 +213,8 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
-        double abs_error = abs(result - precise);
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
         if(abs_error > max_abs_error){
             max_abs_error = abs_error;
             /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
@@ -213,6 +223,7 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
 
         if(writeFile){
             file<<i<<","<<result<<endl;
+            file2<<i<<","<<rel_error<<endl;
         }
 
         sum += abs_error;
@@ -222,6 +233,7 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
 
     if(writeFile){
         file.close();
+        file2.close();
     }
 
     double average_absolute_error = sum/((double) j);
@@ -234,8 +246,10 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
+    ofstream file2;
     if(writeFile) {
         file.open("Iterative_without_rounding" + to_string(fractional_bits)+"_"+ to_string(q) + ".txt");
+        file2.open("Iterative_relative_without_rounding" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
     }
 
 
@@ -250,7 +264,8 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
-        double abs_error = abs(result - precise);
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
         if(abs_error > max_abs_error){
             max_abs_error = abs_error;
             /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
@@ -259,6 +274,7 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
 
         if(writeFile){
             file<<i<<","<<result<<endl;
+            file2<<i<<","<<rel_error<<endl;
         }
 
         sum += abs_error;
@@ -268,6 +284,7 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
 
     if(writeFile){
         file.close();
+        file2.close();
     }
 
     double average_absolute_error = sum/((double) j);
@@ -280,8 +297,10 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
+    ofstream file2;
     if(writeFile) {
         file.open("A_LAW_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("A_LAW_relative_without_rounding" + to_string(fractional_bits) + ".txt");
     }
 
     int j = 0;
@@ -295,7 +314,8 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
-        double abs_error = abs(result - precise);
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
         if(abs_error > max_abs_error){
             max_abs_error = abs_error;
             /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
@@ -304,6 +324,7 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
 
         if(writeFile){
             file<<i<<","<<result<<endl;
+            file2<<i<<","<<rel_error<<endl;
         }
 
         sum += abs_error;
@@ -313,8 +334,16 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
 
     if(writeFile){
         file.close();
+        file2.close();
     }
 
     double average_absolute_error = sum/((double) j);
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
+}
+
+double absolute_error(double precise, double approximate){
+    return abs(precise - approximate);
+}
+double relative_error(double precise, double approximate){
+    return abs(1-(approximate/precise));
 }
