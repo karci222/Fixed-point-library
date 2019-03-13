@@ -202,7 +202,7 @@ Fixed_point Fixed_point::operator+(const Fixed_point &fxp) const {
 
 
 
-Fixed_point Fixed_point::absoluteValue() {
+Fixed_point Fixed_point::absoluteValue() const {
     if(!(this->isNegative())){
         return {this->number, this->integer_bits, this->fractional_bits};
     }else{
@@ -270,4 +270,22 @@ void Fixed_point::setFractional_bits(uint16_t fractional_bits) {
 
 double Fixed_point::largestNum() {
     return (double )((1<<15)-1)/(double )(1 << this->fractional_bits);
+}
+
+Fixed_point Fixed_point::operator*(const Fixed_point &fxp) const {
+    uint32_t op1, op2;
+    uint32_t mask = 0xffff0000;
+
+    op1 = (uint32_t) this->absoluteValue().getNumber();
+    op2 = (uint32_t )fxp.absoluteValue().getNumber();
+
+    uint32_t result = op1 * op2;
+    result = result >> this->getFractional_bits();
+
+    if(this->isNegative() != fxp.isNegative()){
+        result ^= 0xffffffff;
+        result += 1;
+    }
+
+    return Fixed_point((uint16_t) result, this->integer_bits, this->fractional_bits);
 }

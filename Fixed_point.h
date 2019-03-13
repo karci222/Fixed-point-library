@@ -32,13 +32,14 @@ public:
     uint16_t getFractionalPart() ;
     uint16_t getIntegerPart() ;
     double getDoubleValue() const ;
-    Fixed_point absoluteValue();
+    Fixed_point absoluteValue() const ;
     Fixed_point operator+(const Fixed_point &fxp) const;
     Fixed_point operator-(const Fixed_point &fxp) const;
     Fixed_point operator>>(const int &shiftr) const;
     Fixed_point operator<<(const int &shiftl) const;
     bool operator>(const Fixed_point &number) const;
     bool operator<(const Fixed_point &number) const;
+    Fixed_point operator*(const Fixed_point &fxp) const;
     Fixed_point(uint16_t number);
     int isNegative() const ;
     uint16_t getInteger_bits() const;

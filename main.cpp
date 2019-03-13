@@ -14,13 +14,14 @@ void testPLAN(uint16_t fractional_bits, bool writeFile);
 void testA_LAW(uint16_t fractional_bits, bool writeFile);
 void testALIPPI(uint16_t fractional_bits, bool writeFile);
 void testIterative(int q, uint16_t fractional_bits, bool writeFile);
+void testPOLYNOMIAL(uint16_t fractional_bits, bool writeFile);
 double absolute_error(double precise, double approximate);
 double relative_error(double precise, double approximate);
 
 int main() {
-    /*basicExamples();
-    averageAndMaximalError(0);
-    operatorsTest();*/
+    basicExamples();
+    //averageAndMaximalError(0);
+    operatorsTest();
 
     /*for (uint16_t i = 4; i < 14; i++) {
         averageAndMaximalError(false, i);
@@ -35,13 +36,11 @@ int main() {
         testIterative(1, i, true);
         testIterative(2, i, true);
         testIterative(3, i, true);
+        testPOLYNOMIAL(i, true);
         putchar('\n');
         putchar('\n');
     }
 
-    testPLAN(10, false);
-
-//    PLAN(0.951416 , 12);
     return 0;
 }
 
@@ -65,7 +64,10 @@ void basicExamples(){
     printf("FxP 1: %f\n", fxp1.getDoubleValue());
     printf("FxP 2: %f\n", fxp2.getDoubleValue());
 
+    Fixed_point fxp1_1 = Fixed_point(3.98, 3, 12);
+    Fixed_point fxp2_1 = Fixed_point(0.98, 3, 12);
 
+    printf("%f %f\n", 3.98*0.98, (fxp1_1*fxp2_1).getDoubleValue());
 }
 
 /*
@@ -144,9 +146,11 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
     printf("PLAN approximation test...\n");
     ofstream file;
     ofstream file2;
+    ofstream file3;
     if(writeFile) {
         file.open("PLAN_without_rounding" + to_string(fractional_bits) + ".txt");
-        file2.open("PLAN_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("PLAN_relative_without_rounding_fxp" + to_string(fractional_bits) + ".txt");
+        file3.open("PLAN_absolute_without_error_fxp" + to_string(fractional_bits) + ".txt");
     }
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
@@ -160,7 +164,7 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
         double result = PLAN(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double precise = Fixed_point(sigmoid(i), integer_bits, fractional_bits).getDoubleValue();
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
         double abs_error = absolute_error(precise, result);
@@ -174,6 +178,7 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
         if(writeFile) {
             file<<i<< "," << result << endl;
             file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
         }
 
         sum += abs_error;
@@ -186,6 +191,7 @@ void testPLAN(uint16_t fractional_bits, bool writeFile){
     if(writeFile) {
         file.close();
         file2.close();
+        file3.close();
     }
 }
 
@@ -196,9 +202,11 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
     ofstream file2;
+    ofstream file3;
     if(writeFile) {
         file.open("A_LAW_without_rounding" + to_string(fractional_bits) + ".txt");
-        file2.open("A_LAW_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("A_LAW_relative_without_rounding_fxp" + to_string(fractional_bits) + ".txt");
+        file3.open("A_LAW_absolute_without_rounding_fxp" + to_string(fractional_bits) + ".txt");
     }
 
 
@@ -208,7 +216,7 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
         double result = A_LAW(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double precise = Fixed_point(sigmoid(i), integer_bits, fractional_bits).getDoubleValue();
 
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
@@ -224,6 +232,7 @@ void testA_LAW(uint16_t fractional_bits, bool writeFile){
         if(writeFile){
             file<<i<<","<<result<<endl;
             file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
         }
 
         sum += abs_error;
@@ -247,9 +256,11 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
     ofstream file2;
+    ofstream file3;
     if(writeFile) {
         file.open("Iterative_without_rounding" + to_string(fractional_bits)+"_"+ to_string(q) + ".txt");
-        file2.open("Iterative_relative_without_rounding" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
+        file2.open("Iterative_relative_without_rounding_fxp" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
+        file3.open("Iterative_absolute_without_rounding_fxp" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
     }
 
 
@@ -260,7 +271,7 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
         double result = ITERATIVE(i, q, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double precise = Fixed_point(sigmoid(i), integer_bits, fractional_bits).getDoubleValue();
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
@@ -275,6 +286,7 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
         if(writeFile){
             file<<i<<","<<result<<endl;
             file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
         }
 
         sum += abs_error;
@@ -285,6 +297,7 @@ void testIterative(int q, uint16_t fractional_bits, bool writeFile){
     if(writeFile){
         file.close();
         file2.close();
+        file3.close();
     }
 
     double average_absolute_error = sum/((double) j);
@@ -298,9 +311,11 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;
     ofstream file2;
+    ofstream file3;
     if(writeFile) {
         file.open("A_LAW_without_rounding" + to_string(fractional_bits) + ".txt");
         file2.open("A_LAW_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file3.open("A_LAW_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
     }
 
     int j = 0;
@@ -325,6 +340,7 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
         if(writeFile){
             file<<i<<","<<result<<endl;
             file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
         }
 
         sum += abs_error;
@@ -335,6 +351,61 @@ void testALIPPI(uint16_t fractional_bits, bool writeFile){
     if(writeFile){
         file.close();
         file2.close();
+        file3.close();
+    }
+
+    double average_absolute_error = sum/((double) j);
+    printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
+}
+
+void testPOLYNOMIAL(uint16_t fractional_bits, bool writeFile){
+    printf("Polynomial approximation test...\n");
+    double i = -15.0;
+    double di = (double) 1 /(double)(1<<fractional_bits);
+    uint16_t integer_bits = 15 - fractional_bits;
+    ofstream file;
+    ofstream file2;
+    ofstream file3;
+    if(writeFile) {
+        file.open("Polynomial_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("Polynomial_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file3.open("Polynomial_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
+    }
+
+    int j = 0;
+    double sum = 0;
+    double max_abs_error = 0;
+
+    while (i < 15.0){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        double result = POLYNOMIALLINEAR(i, fractional_bits).getDoubleValue();
+        double precise = sigmoid(i);
+        //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
+
+
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
+        if(abs_error > max_abs_error){
+            max_abs_error = abs_error;
+            /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
+            printf("Number: %f\tFixed point number: %f\tRepresentation: %u\n", i, i_fxp.getDoubleValue(), i_fxp.getNumber());*/
+        }
+
+        if(writeFile){
+            file<<i<<","<<result<<endl;
+            file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
+        }
+
+        sum += abs_error;
+        j+=1;
+        i += di;
+    }
+
+    if(writeFile){
+        file.close();
+        file2.close();
+        file3.close();
     }
 
     double average_absolute_error = sum/((double) j);
