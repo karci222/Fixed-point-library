@@ -52,7 +52,47 @@ Fixed_point POLYNOMIALLINEAR(Fixed_point x){
     }else if (x.getDoubleValue() <= -4.0){
         return Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits() );
     }else{
-        y= x.absoluteValue() * Fixed_point(coefficients[index][0], x.getInteger_bits(), x.getFractional_bits()) + coefficients[index][1];
+            y= x.absoluteValue() * Fixed_point(coefficients[index][0], x.getInteger_bits(), x.getFractional_bits()) + coefficients[index][1];
+    }
+
+    if (x.isNegative()){
+        return Fixed_point(1.0,x.getInteger_bits(), x.getFractional_bits()) - y;
+    }else{
+        return y;
+    }
+}
+
+Fixed_point POLYNOMIALQUADRATIC(Fixed_point x){
+    double const coefficients[16][3] = {{ 0.25064397, -0.00775187,  0.5       },
+                                        { 0.25786815, -0.02231577,  0.4991042 },
+                                        { 0.26974543, -0.03429437,  0.49616021},
+                                        { 0.28215508, -0.04264889,  0.49155239},
+                                        { 0.29091557, -0.04708909,  0.48723209},
+                                        { 0.29302965, -0.04797498,  0.4859737 },
+                                        { 0.28725209, -0.04607347,  0.49036165},
+                                        { 0.27397386, -0.04229247,  0.50201923},
+                                        { 0.2546969 , -0.03747837,  0.52131676},
+                                        { 0.23141749, -0.03230576,  0.54750909},
+                                        { 0.20612937, -0.02724633,  0.57910798},
+                                        { 0.18052204, -0.02258764,  0.61429677},
+                                        { 0.15585688, -0.01847375,  0.65126723},
+                                        { 0.13296547, -0.01494916,  0.68843586},
+                                        { 0.11231306, -0.01199636,  0.72454749},
+                                        { 0.09408519, -0.00956394,  0.7586961 }};
+
+    int index = x.absoluteValue().getNumber();
+    index = index >> (x.getFractional_bits() - 2);
+
+
+    Fixed_point  y;
+
+    if(x.getDoubleValue() >= 4.0){
+        return Fixed_point(1.0, x.getInteger_bits(), x.getFractional_bits() );
+    }else if (x.getDoubleValue() <= -4.0){
+        return Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits() );
+    }else{
+        y= x.absoluteValue() * Fixed_point(coefficients[index][1], x.getInteger_bits(), x.getFractional_bits()) + coefficients[index][0];
+        y = x.absoluteValue()*y + Fixed_point(coefficients[index][2]);
     }
 
     if (x.isNegative()){
@@ -71,6 +111,19 @@ Fixed_point POLYNOMIALLINEAR(double x, uint16_t fractional_bits){
         }
     }else{
         return POLYNOMIALLINEAR(Fixed_point(x, (uint16_t )15-fractional_bits, fractional_bits));
+    }
+}
+
+
+Fixed_point POLYNOMIALQUADRATIC(double x, uint16_t fractional_bits){
+    if (abs(x) > Fixed_point(0.0, 15-fractional_bits, fractional_bits).largestNum()){
+        if (x > 0){
+            return Fixed_point(1.0, (uint16_t )15-fractional_bits, fractional_bits);
+        }else{
+            return Fixed_point(0.0, (uint16_t )15-fractional_bits, fractional_bits);
+        }
+    }else{
+        return POLYNOMIALQUADRATIC(Fixed_point(x, (uint16_t )15-fractional_bits, fractional_bits));
     }
 }
 
@@ -173,7 +226,7 @@ Fixed_point ITERATIVE(Fixed_point x, int q){
     Fixed_point g = Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits());
     Fixed_point h = (Fixed_point(1.0, x.getInteger_bits(), x.getFractional_bits()) + x>>1)>>1;
 
-    for (int i = 0; i <= q; i++){
+    for (int i = 0; i < q; i++){
         Fixed_point g_dot = (g > h) ? g: h;
         h = (g + h + fxpdelta)>>1;
         g = g_dot;
