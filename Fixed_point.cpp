@@ -7,80 +7,18 @@
 #include "Fixed_point.h"
 
 Fixed_point::Fixed_point(double number) {
+    int helper = 1 << 11;
+    this->number = (uint16_t) (round(number*helper));
     this->fractional_bits = 11;
     this->integer_bits = 4;
-    this->number = 0;
-    uint16_t integerPart = (uint16_t) number;
-    uint16_t fractionalPart = convert_fraction(number);
-
-
-
-    if(number >= 0) {
-        if (number > 15) {
-            integerPart = 15;
-            fractionalPart = (1 << 12) - 1;
-        }
-
-        this->number |= (integerPart << 11);
-        this->number |= fractionalPart;
-    }else{
-        number = number * (-1);
-        uint16_t integerPart = (uint16_t) number;
-        uint16_t fractionalPart = convert_fraction(number);
-
-        if (number > 15) {
-            integerPart = 15;
-            printf("Number was too big and had to be concatenated!");
-            fractionalPart = (1 << 12) - 1;
-        }
-
-        this->number |= (integerPart << 11);
-        this->number |= fractionalPart;
-
-        this->number ^= 65536 - 1;
-        this->number += 1;
-    }
 }
 
 
 Fixed_point::Fixed_point(double number, uint16_t integer_bits, uint16_t fractional_bits) {
+    int helper = 1 << fractional_bits;
     this->integer_bits = integer_bits;
     this->fractional_bits = fractional_bits;
-    this->number = 0;
-
-    uint16_t integer_part = (uint16_t) number;
-    uint16_t fractional_part = convert_fraction(number);
-
-    if(integer_bits + fractional_bits != 15){
-        printf("Wrong format");
-    }
-
-
-
-    if(number >= 0){
-        if(number > ((1 << integer_bits) - 1)){
-            integer_part = (uint16_t ) ((1<<integer_bits) - 1);
-            fractional_part = (uint16_t) ((1<<this->fractional_bits) - 1);
-        }
-
-        this->number |= (integer_part << this->fractional_bits);
-        this->number |= fractional_part;
-    }else{
-        number = number * (-1);
-        integer_part = (uint16_t) number;
-        fractional_part = convert_fraction(number);
-
-        if(number > ((1 << integer_bits) - 1)){
-            integer_part = (uint16_t ) ((1<<integer_bits) - 1);
-            fractional_part = (uint16_t) ((1<<this->fractional_bits) - 1);
-        }
-
-        this->number |= (integer_part<< this->fractional_bits);
-        this->number |= fractional_part;
-
-        this->number ^= 65536 - 1;
-        this->number += 1;
-    }
+    this->number = (uint16_t) (round(number*helper));
 }
 
 Fixed_point::Fixed_point() {
@@ -277,7 +215,7 @@ Fixed_point Fixed_point::operator*(const Fixed_point &fxp) const {
     uint32_t mask = 0xffff0000;
 
     op1 = (uint32_t) this->absoluteValue().getNumber();
-    op2 = (uint32_t )fxp.absoluteValue().getNumber();
+    op2 = (uint32_t)fxp.absoluteValue().getNumber();
 
     uint32_t result = op1 * op2;
     result = result >> this->getFractional_bits();

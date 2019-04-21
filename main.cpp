@@ -18,6 +18,12 @@ void testPOLYNOMIAL(uint16_t fractional_bits, bool writeFile);
 void testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool writeFile);
 double absolute_error(double precise, double approximate);
 double relative_error(double precise, double approximate);
+void runPLAN(uint16_t fractional_bits);
+void runALIPPI(uint16_t fractional_bits);
+void runA_LAW(uint16_t fractional_bits);
+void runIterative(int q,uint16_t fractional_bits);
+void runLinear(uint16_t fractional_bits);
+void runQuadratic(uint16_t fractional_bits);
 
 int main() {
     basicExamples();
@@ -30,7 +36,7 @@ int main() {
     
     for(uint16_t i = 4; i < 13; i++) {
         printf("Testing the approximations for fractional bits: %u\n", i);
-        testPLAN(i, true);
+        /*testPLAN(i, true);
         testA_LAW(i, true);
         testALIPPI(i, true);
         testIterative(0, i, true);
@@ -39,9 +45,22 @@ int main() {
         testIterative(3, i, true);
         testPOLYNOMIAL(i, true);
         testPOLYNOMIALQUADRATIC(i, true);
+
+        runA_LAW(i);
+        runALIPPI(i);
+        runPLAN(i);
+        runIterative(0, i);
+        runIterative(1, i);
+        runIterative(2, i);
+        runIterative(3, i);
+*/
+        //runLinear(i);
+        runQuadratic(i);
+
         putchar('\n');
         putchar('\n');
     }
+
 
     return 0;
 }
@@ -466,6 +485,126 @@ void testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool writeFile){
 
     double average_absolute_error = sum/((double) j);
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
+}
+
+void runPLAN(uint16_t fractional_bits){
+    printf("PLAN range test...\n");
+    ofstream file;
+    file.open("PLAN_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = PLAN(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << result << endl;
+    }
+
+    file.close();
+}
+
+void runALIPPI(uint16_t fractional_bits){
+    printf("ALIPPI range test...\n");
+    ofstream file;
+    file.open("ALIPPI_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = ALIPPI(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << result << endl;
+    }
+
+    file.close();
+}
+
+void runA_LAW(uint16_t fractional_bits){
+    printf("A_LAW range test...\n");
+    ofstream file;
+    file.open("A_LAW_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = A_LAW(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << result << endl;
+    }
+
+    file.close();
+}
+
+void runIterative(int q,uint16_t fractional_bits){
+    cout<<"Iterative " + to_string(q) + " range test..."<<endl;
+    ofstream file;
+    file.open("Iterative_" + to_string(q) + "_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = ITERATIVE(i_fxp, q).getNumber();
+
+
+        file<<short(i)<< "," << result << endl;
+    }
+
+    file.close();
+}
+
+void runLinear(uint16_t fractional_bits){
+    printf("Linear range test...\n");
+    ofstream file;
+    file.open("Linear_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = POLYNOMIALLINEAR(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void runQuadratic(uint16_t fractional_bits){
+    printf("Quadratic range test...\n");
+    ofstream file;
+    file.open("Quadratic_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (uint16_t i = 0; i < 0xFFFF; i++){
+        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
+        uint16_t result = POLYNOMIALQUADRATIC(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
 }
 
 double absolute_error(double precise, double approximate){

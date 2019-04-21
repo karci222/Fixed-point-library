@@ -47,12 +47,12 @@ Fixed_point POLYNOMIALLINEAR(Fixed_point x){
 
     Fixed_point  y;
 
-    if(x.getDoubleValue() >= 4.0){
+    if(x.getNumber() >= 4.0){
         return Fixed_point(1.0, x.getInteger_bits(), x.getFractional_bits() );
     }else if (x.getDoubleValue() <= -4.0){
         return Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits() );
     }else{
-            y= x.absoluteValue() * Fixed_point(coefficients[index][0], x.getInteger_bits(), x.getFractional_bits()) + coefficients[index][1];
+            y= x.absoluteValue() * Fixed_point(coefficients[index][0], x.getInteger_bits(), x.getFractional_bits()) + Fixed_point(coefficients[index][1], x.getInteger_bits(), x.getFractional_bits());
     }
 
     if (x.isNegative()){
@@ -91,8 +91,11 @@ Fixed_point POLYNOMIALQUADRATIC(Fixed_point x){
     }else if (x.getDoubleValue() <= -4.0){
         return Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits() );
     }else{
-        y= x.absoluteValue() * Fixed_point(coefficients[index][1], x.getInteger_bits(), x.getFractional_bits()) + coefficients[index][0];
-        y = x.absoluteValue()*y + Fixed_point(coefficients[index][2]);
+        Fixed_point c_1 = Fixed_point(coefficients[index][1], x.getInteger_bits(), x.getFractional_bits());
+        Fixed_point c_2 = Fixed_point(coefficients[index][0], x.getInteger_bits(), x.getFractional_bits());
+        Fixed_point c_3 = Fixed_point(coefficients[index][2], x.getInteger_bits(), x.getFractional_bits());
+        y= x.absoluteValue() * c_1 + c_2;
+        y = x.absoluteValue()*y + c_3;
     }
 
     if (x.isNegative()){
@@ -199,7 +202,7 @@ Fixed_point ITERATIVE(Fixed_point x, int q){
 
     if (x.getDoubleValue() >= 0){
         double new_x = (-1)*x.getDoubleValue();
-        x = new_x;
+        x = Fixed_point(new_x, x.getInteger_bits(), x.getFractional_bits());
         negative = false;
     }
 
@@ -226,7 +229,7 @@ Fixed_point ITERATIVE(Fixed_point x, int q){
     Fixed_point g = Fixed_point(0.0, x.getInteger_bits(), x.getFractional_bits());
     Fixed_point h = (Fixed_point(1.0, x.getInteger_bits(), x.getFractional_bits()) + x>>1)>>1;
 
-    for (int i = 0; i < q; i++){
+    for (int i = 0; i <= q; i++){
         Fixed_point g_dot = (g > h) ? g: h;
         h = (g + h + fxpdelta)>>1;
         g = g_dot;
