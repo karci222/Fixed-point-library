@@ -79,7 +79,7 @@ uint16_t Fixed_point::getIntegerPart() {
 
 double Fixed_point::getDoubleValue() const {
     if(!(this->isNegative())){
-        double res = (double )this->number/(double )(1 << this->fractional_bits);
+        double res = (double)this->number/(double )(1 << this->fractional_bits);
         return res;
     }else{
         uint16_t number = this->number ^ (uint16_t )(0xffff);
