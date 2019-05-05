@@ -5,7 +5,7 @@ project(ApproximationTests)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(ApproximationTests main.cpp Fixed_point.cpp Fixed_point.h Approximations.cpp Approximations.h)
+add_executable(ApproximationTests main.cpp Fixed_point.cpp Fixed_point.h Approximations.cpp Approximations.h Simulator.cpp Simulator.h Approximations_tanh.cpp Approximations_tanh.h)
 include_directories(
         Cnl INTERFACE
         $<BUILD_INTERFACE:"C:\\Program Files (x86)\\CNL_Library\\cnl-develop\\include">

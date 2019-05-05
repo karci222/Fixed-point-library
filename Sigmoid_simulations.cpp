@@ -4,6 +4,7 @@
 
 #include "Sigmoid_simulations.h"
 
+
 void Sigmoid_simulations::testPLAN(uint16_t fractional_bits, bool writeFile){
     printf("PLAN approximation test...\n");
     ofstream file;

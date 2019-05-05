@@ -8,7 +8,6 @@
 
 class Sigmoid_simulations: Simulator{
 public:
-public:
     void runPLAN(uint16_t fractional_bits);
     void runALIPPI(uint16_t fractional_bits);
     void runA_LAW(uint16_t fractional_bits);
