@@ -1,16 +1,153 @@
 //
-// Created by Karol on 4. 5. 2019.
+// Created by Karol on 5. 5. 2019.
 //
 
-#include "Sigmoid_simulations.h"
-#include "Fixed_point.h"
-#include <iostream>
+#include "TanH_simulations.h"
+#include "Approximations_tanh.h"
 #include <cmath>
+#include <cstdint>
+#include <iostream>
 #include <fstream>
 
 using namespace std;
 
-void Sigmoid_simulations::testPLAN(uint16_t fractional_bits, bool writeFile){
+double TanH_simulations::TanH(double x) {
+    return tanh(x);
+}
+
+void TanH_simulations::runPLAN(uint16_t fractional_bits) {
+    printf("TanH PLAN range test...\n");
+    ofstream file;
+    file.open("TanH_PLAN_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = TanH_PLAN(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::runALIPPI(uint16_t fractional_bits) {
+    printf("TanH ALIPPI range test...\n");
+    ofstream file;
+    file.open("TanH_ALIPPI_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        //printf("%d\n", i);
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = TanH_ALIPPI(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::runA_LAW(uint16_t fractional_bits) {
+    printf("TanH A_LAW range test...\n");
+    ofstream file;
+    file.open("TanH_A_LAW_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = TanH_A_LAW(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::runPLATanH(uint16_t fractional_bits) {
+    printf("TanH PLATanH range test...\n");
+    ofstream file;
+    file.open("TanH_PLATanH_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = PLATanH(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::runLinear(uint16_t fractional_bits) {
+    printf("TanH linear interpolation range test...\n");
+    ofstream file;
+    file.open("TanH_Linear_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = LinearInterpolation(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::runQuadratic(uint16_t fractional_bits) {
+    printf("TanH quadratic range test...\n");
+    ofstream file;
+    file.open("TanH_Quadratic_range" + to_string(fractional_bits) + ".txt");
+
+    uint16_t integer_bits = 15 - fractional_bits;
+
+    int j = 0;
+
+    for (short i = -32766; i < 32767; i++){
+        Fixed_point i_fxp = Fixed_point((uint16_t)i, integer_bits, fractional_bits);
+        uint16_t result = QuadraticInterpolation(i_fxp).getNumber();
+
+
+        file<<short(i)<< "," << short(result) << endl;
+    }
+
+    file.close();
+}
+
+void TanH_simulations::perform_run() {
+    for (uint16_t i = 4; i < 14; i++){
+        runA_LAW(i);
+        runALIPPI(i);
+        runPLAN(i);
+        /*runPLATanH(i);
+        runLinear(i);
+        runQuadratic(i);*/
+    }
+}
+
+void TanH_simulations::testPLAN(uint16_t fractional_bits, bool writeFile) {
     printf("PLAN approximation test...\n");
     ofstream file;
     ofstream file2;
@@ -31,8 +168,8 @@ void Sigmoid_simulations::testPLAN(uint16_t fractional_bits, bool writeFile){
 
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = PLAN(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double result = TanH_PLAN(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
         double abs_error = absolute_error(precise, result);
@@ -63,7 +200,7 @@ void Sigmoid_simulations::testPLAN(uint16_t fractional_bits, bool writeFile){
     }
 }
 
-void Sigmoid_simulations::testA_LAW(uint16_t fractional_bits, bool writeFile){
+void TanH_simulations::testA_LAW(uint16_t fractional_bits, bool writeFile) {
     printf("A-Law approximation test...\n");
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
@@ -83,8 +220,8 @@ void Sigmoid_simulations::testA_LAW(uint16_t fractional_bits, bool writeFile){
     double max_abs_error = 0;
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = A_LAW(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double result = TanH_A_LAW(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
 
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
@@ -117,62 +254,7 @@ void Sigmoid_simulations::testA_LAW(uint16_t fractional_bits, bool writeFile){
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
 }
 
-void Sigmoid_simulations::testIterative(int q, uint16_t fractional_bits, bool writeFile){
-    printf("Iterative %d approximation test...\n", q);
-    double i = -15.0;
-    double di = (double) 1 /(double)(1<<fractional_bits);
-    uint16_t integer_bits = 15 - fractional_bits;
-    ofstream file;
-    ofstream file2;
-    ofstream file3;
-    if(writeFile) {
-        file.open("Iterative_without_rounding" + to_string(fractional_bits)+"_"+ to_string(q) + ".txt");
-        file2.open("Iterative_relative_without_rounding_fxp" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
-        file3.open("Iterative_absolute_without_rounding_fxp" + to_string(fractional_bits) + "_" + to_string(q) + ".txt");
-    }
-
-
-    int j = 0;
-    double sum = 0;
-    double max_abs_error = 0;
-
-    while (i < 15.0){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = ITERATIVE(i, q, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
-        //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
-
-
-        double abs_error = absolute_error(precise, result);
-        double rel_error = relative_error(precise, result);
-        if(abs_error > max_abs_error){
-            max_abs_error = abs_error;
-            /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
-            printf("Number: %f\tFixed point number: %f\tRepresentation: %u\n", i, i_fxp.getDoubleValue(), i_fxp.getNumber());*/
-        }
-
-        if(writeFile){
-            file<<i<<","<<result<<endl;
-            file2<<i<<","<<rel_error<<endl;
-            file3<<i<<","<<abs_error<<endl;
-        }
-
-        sum += abs_error;
-        j+=1;
-        i += di;
-    }
-
-    if(writeFile){
-        file.close();
-        file2.close();
-        file3.close();
-    }
-
-    double average_absolute_error = sum/((double) j);
-    printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
-}
-
-void Sigmoid_simulations::testALIPPI(uint16_t fractional_bits, bool writeFile){
+void TanH_simulations::testALIPPI(uint16_t fractional_bits, bool writeFile) {
     printf("Alippi approximation test...\n");
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
@@ -192,8 +274,8 @@ void Sigmoid_simulations::testALIPPI(uint16_t fractional_bits, bool writeFile){
 
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = ALIPPI(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double result = TanH_ALIPPI(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
@@ -226,8 +308,8 @@ void Sigmoid_simulations::testALIPPI(uint16_t fractional_bits, bool writeFile){
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
 }
 
-void Sigmoid_simulations::testPOLYNOMIAL(uint16_t fractional_bits, bool writeFile){
-    printf("Polynomial approximation test...\n");
+void TanH_simulations::testPLATanH(uint16_t fractional_bits, bool writeFile) {
+    printf("PLATanH approximation test...\n");
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
@@ -235,9 +317,9 @@ void Sigmoid_simulations::testPOLYNOMIAL(uint16_t fractional_bits, bool writeFil
     ofstream file2;
     ofstream file3;
     if(writeFile) {
-        file.open("Polynomial_without_rounding" + to_string(fractional_bits) + ".txt");
-        file2.open("Polynomial_relative_without_rounding" + to_string(fractional_bits) + ".txt");
-        file3.open("Polynomial_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
+        file.open("PLATanH_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("PLATanH_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file3.open("PLATanH_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
     }
 
     int j = 0;
@@ -246,8 +328,8 @@ void Sigmoid_simulations::testPOLYNOMIAL(uint16_t fractional_bits, bool writeFil
 
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = POLYNOMIALLINEAR(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double result = PLATanH(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
@@ -280,8 +362,8 @@ void Sigmoid_simulations::testPOLYNOMIAL(uint16_t fractional_bits, bool writeFil
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
 }
 
-void Sigmoid_simulations::testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool writeFile){
-    printf("Polynomial quadratic approximation test...\n");
+void TanH_simulations::testLinear(uint16_t fractional_bits, bool writeFile) {
+    printf("Linear approximation test...\n");
     double i = -15.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
@@ -289,9 +371,9 @@ void Sigmoid_simulations::testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool
     ofstream file2;
     ofstream file3;
     if(writeFile) {
-        file.open("Polynomial_quadratic_without_rounding" + to_string(fractional_bits) + ".txt");
-        file2.open("Polynomial_quadratic_relative_without_rounding" + to_string(fractional_bits) + ".txt");
-        file3.open("Polynomial_quadratic_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
+        file.open("Linear_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("Linear_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file3.open("Linear_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
     }
 
     int j = 0;
@@ -300,8 +382,8 @@ void Sigmoid_simulations::testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool
 
     while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        double result = POLYNOMIALQUADRATIC(i, fractional_bits).getDoubleValue();
-        double precise = sigmoid(i);
+        double result = Linear_interpolation(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
         //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
@@ -334,154 +416,69 @@ void Sigmoid_simulations::testPOLYNOMIALQUADRATIC(uint16_t fractional_bits, bool
     printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
 }
 
-void Sigmoid_simulations::runPLAN(uint16_t fractional_bits){
-    printf("PLAN range test...\n");
-    ofstream file;
-    file.open("PLAN_range" + to_string(fractional_bits) + ".txt");
-
+void TanH_simulations::testQuadratic(uint16_t fractional_bits, bool writeFile) {
+    printf("Quadratic approximation test...\n");
+    double i = -15.0;
+    double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
+    ofstream file;
+    ofstream file2;
+    ofstream file3;
+    if(writeFile) {
+        file.open("Quadratic_without_rounding" + to_string(fractional_bits) + ".txt");
+        file2.open("Quadratic_relative_without_rounding" + to_string(fractional_bits) + ".txt");
+        file3.open("Quadratic_absolute_without_rounding" + to_string(fractional_bits) + ".txt");
+    }
 
     int j = 0;
+    double sum = 0;
+    double max_abs_error = 0;
 
-    for (uint16_t i = 0; i < 0xFFFF; i++){
+    while (i < 15.0){
         Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = PLAN(i_fxp).getNumber();
+        double result = Quadratic_interpolation(i, fractional_bits).getDoubleValue();
+        double precise = TanH(i);
+        //printf("For i: %f\t Result: %f\t Precise result: %f\n", i_fxp.getDoubleValue(), result, precise);
 
 
-        file<<short(i)<< "," << result << endl;
+        double abs_error = absolute_error(precise, result);
+        double rel_error = relative_error(precise, result);
+        if(abs_error > max_abs_error){
+            max_abs_error = abs_error;
+            /*printf("Number: %f\tResult: %f\tPrecise result: %f\tError: %f\n",i,  result, precise, abs_error);
+            printf("Number: %f\tFixed point number: %f\tRepresentation: %u\n", i, i_fxp.getDoubleValue(), i_fxp.getNumber());*/
+        }
+
+        if(writeFile){
+            file<<i<<","<<result<<endl;
+            file2<<i<<","<<rel_error<<endl;
+            file3<<i<<","<<abs_error<<endl;
+        }
+
+        sum += abs_error;
+        j+=1;
+        i += di;
     }
 
-    file.close();
-}
-
-void Sigmoid_simulations::runALIPPI(uint16_t fractional_bits){
-    printf("ALIPPI range test...\n");
-    ofstream file;
-    file.open("ALIPPI_range" + to_string(fractional_bits) + ".txt");
-
-    uint16_t integer_bits = 15 - fractional_bits;
-
-    int j = 0;
-
-    for (uint16_t i = 0; i < 0xFFFF; i++){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = ALIPPI(i_fxp).getNumber();
-
-
-        file<<short(i)<< "," << result << endl;
+    if(writeFile){
+        file.close();
+        file2.close();
+        file3.close();
     }
 
-    file.close();
+    double average_absolute_error = sum/((double) j);
+    printf("Average absolute error: %f\t Maximal absolute error: %f\n", average_absolute_error, max_abs_error);
 }
 
-void Sigmoid_simulations::runA_LAW(uint16_t fractional_bits){
-    printf("A_LAW range test...\n");
-    ofstream file;
-    file.open("A_LAW_range" + to_string(fractional_bits) + ".txt");
-
-    uint16_t integer_bits = 15 - fractional_bits;
-
-    int j = 0;
-
-    for (uint16_t i = 0; i < 0xFFFF; i++){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = A_LAW(i_fxp).getNumber();
-
-
-        file<<short(i)<< "," << result << endl;
-    }
-
-    file.close();
-}
-
-void Sigmoid_simulations::runIterative(int q,uint16_t fractional_bits){
-    cout<<"Iterative " + to_string(q) + " range test..."<<endl;
-    ofstream file;
-    file.open("Iterative_" + to_string(q) + "_range" + to_string(fractional_bits) + ".txt");
-
-    uint16_t integer_bits = 15 - fractional_bits;
-
-    int j = 0;
-
-    for (uint16_t i = 0; i < 0xFFFF; i++){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = ITERATIVE(i_fxp, q).getNumber();
-
-
-        file<<short(i)<< "," << result << endl;
-    }
-
-    file.close();
-}
-
-void Sigmoid_simulations::runLinear(uint16_t fractional_bits){
-    printf("Linear range test...\n");
-    ofstream file;
-    file.open("Linear_range" + to_string(fractional_bits) + ".txt");
-
-    uint16_t integer_bits = 15 - fractional_bits;
-
-    int j = 0;
-
-    for (uint16_t i = 0; i < 0xFFFF; i++){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = POLYNOMIALLINEAR(i_fxp).getNumber();
-
-
-        file<<short(i)<< "," << short(result) << endl;
-    }
-
-    file.close();
-}
-
-void Sigmoid_simulations::runQuadratic(uint16_t fractional_bits){
-    printf("Quadratic range test...\n");
-    ofstream file;
-    file.open("Quadratic_range" + to_string(fractional_bits) + ".txt");
-
-    uint16_t integer_bits = 15 - fractional_bits;
-
-    int j = 0;
-
-    for (uint16_t i = 0; i < 0xFFFF; i++){
-        Fixed_point i_fxp = Fixed_point(i, integer_bits, fractional_bits);
-        uint16_t result = POLYNOMIALQUADRATIC(i_fxp).getNumber();
-
-
-        file<<short(i)<< "," << short(result) << endl;
-    }
-
-    file.close();
-}
-
-double Sigmoid_simulations::sigmoid(double x) {
-    return (double)1/((double)1 + exp(-x));
-}
-
-void Sigmoid_simulations::perform_run(){
-    for (int i = 4; i < 13; i++){
-        runALIPPI(i);
-        runA_LAW(i);
-        runPLAN(i);
-        runIterative(0, i);
-        runIterative(1, i);
-        runIterative(2, i);
-        runIterative(3, i);
-        runLinear(i);
-        runQuadratic(i);
-    }
-}
-
-void Sigmoid_simulations::perform_test() {
-    for (int i = 4; i < 13; i++){
+void TanH_simulations::perform_test() {
+    for (int i = 4; i <= 12; ++i) {
+        printf("For fractional bits: %d\n", i);
         testA_LAW(i, true);
-        testALIPPI(i, true);
+        //testALIPPI(i, true);
         testPLAN(i, true);
-        testIterative(0, i, true);
-        testIterative(1, i, true);
-        testIterative(2, i, true);
-        testIterative(3, i, true);
-        testPOLYNOMIAL(i, true);
-        testPOLYNOMIALQUADRATIC(i, true);
+        /*testPLATanH(i, true);
+        testLinear(i, true);
+        testQuadratic(i, true);*/
     }
 }
+

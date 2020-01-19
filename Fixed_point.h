@@ -39,6 +39,9 @@ public:
     Fixed_point operator<<(const int &shiftl) const;
     bool operator>(const Fixed_point &number) const;
     bool operator<(const Fixed_point &number) const;
+    bool operator<=(const Fixed_point &number) const;
+    bool operator>=(const Fixed_point &number) const;
+    bool operator==(const Fixed_point &number) const;
     Fixed_point operator*(const Fixed_point &fxp) const;
     Fixed_point(uint16_t number);
     int isNegative() const ;
@@ -47,6 +50,7 @@ public:
     uint16_t getFractional_bits() const;
     void setFractional_bits(uint16_t fractional_bits);
     double largestNum();
+    int getLeadingOnes();
 
 private:
     uint16_t convert_fraction(double number);

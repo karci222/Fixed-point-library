@@ -10,6 +10,8 @@ class Simulator {
 public:
     double absolute_error(double precise, double approximate);
     double relative_error(double precise, double approximate);
+    virtual void perform_run() = 0;
+    virtual void perform_test() = 0;
 };
 
 

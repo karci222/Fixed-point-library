@@ -8,6 +8,7 @@
 
 #include "Fixed_point.h"
 
+
 Fixed_point PLAN(Fixed_point x);
 Fixed_point A_LAW(Fixed_point x);
 Fixed_point ALIPPI(Fixed_point x);

@@ -3,18 +3,26 @@
 #include <fstream>
 #include "Fixed_point.h"
 #include "Approximations.h"
+#include "Simulator.h"
+#include "TanH_simulations.h"
+#include "CORDIC.h"
+#include "BKM.h"
+#include "ELU_simulations.h"
+
 
 using namespace std;
 
-double sigmoid(double x);
 void basicExamples();
 void averageAndMaximalError(int print, uint16_t fractional_bits);
 void operatorsTest();
 
 
 int main() {
+    Simulator *simulator = new ELU_simulations();
 
-    return 0;
+    simulator->perform_test();
+
+
 }
 
 void basicExamples(){
@@ -109,10 +117,6 @@ void operatorsTest(){
     printf("FxP value: %u\t Double value: %f\n", fxp_pos1.getNumber(), fxp_pos1.getDoubleValue());
     fxp_pos1 = 4.2;
     printf("FxP value: %u\t Double value: %f\n", fxp_pos1.getNumber(), fxp_pos1.getDoubleValue());
-}
-
-double sigmoid(double x){
-    return (double)1/((double)1 + exp(-x));
 }
 
 

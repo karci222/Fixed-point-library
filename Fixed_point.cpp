@@ -227,3 +227,28 @@ Fixed_point Fixed_point::operator*(const Fixed_point &fxp) const {
 
     return Fixed_point((uint16_t) result, this->integer_bits, this->fractional_bits);
 }
+
+bool Fixed_point::operator<=(const Fixed_point &number) const {
+    return *this < number || *this == number;
+}
+
+bool Fixed_point::operator>=(const Fixed_point &number) const {
+    return *this > number || *this == number;
+}
+
+bool Fixed_point::operator==(const Fixed_point &number) const {
+    if ((this->getFractional_bits() != number.getFractional_bits()) || (this->getInteger_bits() != number.getInteger_bits())){
+        printf("Wrong sizes! Numbers: %f\t %f\nInteger parts: %u\t %u\nFractional parts: %u\t %u\n", this->getDoubleValue(),
+               number.getDoubleValue(),
+               this->integer_bits,
+               number.getInteger_bits(),
+               this->fractional_bits,
+               number.getFractional_bits());
+    }
+    return this->getNumber() == number.getNumber();
+}
+
+int Fixed_point::getLeadingOnes() {
+    double leading_zeros = (int) log2((double) this->number);
+    return leading_zeros;
+}
