@@ -95,7 +95,7 @@ void ELU_simulations::runLinear(uint16_t fractional_bits) {
 
 void ELU_simulations::testBKM(uint16_t fractional_bits, bool writeFile) {
     printf("BKM ELU approximation test...\n");
-    double i = ;
+    double i = -18.0;
     double di = (double) 1 /(double)(1<<fractional_bits);
     uint16_t integer_bits = 15 - fractional_bits;
     ofstream file;

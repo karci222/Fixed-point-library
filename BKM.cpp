@@ -80,7 +80,7 @@ Fixed_point *BKM::bkm_2(Fixed_point x, Fixed_point l0, int iterations) {
     int di_int = 0;
 
     Fixed_point epsilon_0 = compute_error(0, Ei);
-    Fixed_point cond_0 = Fixed_point(-7.0/16.0, x.getInteger_bits(), x.getFractional_bits());
+    Fixed_point cond_0 = Fixed_point(-6.0/16.0, x.getInteger_bits(), x.getFractional_bits());
     if (epsilon_0 >= cond_0){
         di_int = 1;
     }else{
@@ -96,15 +96,17 @@ Fixed_point *BKM::bkm_2(Fixed_point x, Fixed_point l0, int iterations) {
 
         if (i > 0) {
             if (epsilon >= cond_half) {
-                di_int = 1;
-                di = Fixed_point(1.0, this->integer_bits, this->fractional_bits);
+                di_int = -1;
+                di = Fixed_point(-1.0, this->integer_bits, this->fractional_bits);
             } else if (epsilon > cond_negative_half){
                 di_int = 0;
                 di = Fixed_point(0.0, this->integer_bits, this->fractional_bits);
             }else{
-                di_int -1;
-                di = Fixed_point(-1.0, this->integer_bits, this->fractional_bits);
+                di_int = 1;
+                di = Fixed_point(1.0, this->integer_bits, this->fractional_bits);
             }
+        }else{
+            di = Fixed_point((double)di_int, this->integer_bits, this->fractional_bits);
         }
 
         Fixed_point L_term = ROM_lookup(di_int, i);
@@ -123,7 +125,7 @@ Fixed_point *BKM::bkm_2(Fixed_point x, Fixed_point l0, int iterations) {
 }
 
 Fixed_point BKM::compute_error(int n, Fixed_point Ei) {
-    Fixed_point two_to_n = Fixed_point(2.0, Ei.getInteger_bits(), Ei.getFractional_bits());
+    Fixed_point two_to_n = Fixed_point(1.0, Ei.getInteger_bits(), Ei.getFractional_bits());
     two_to_n = two_to_n << n;
 
     Fixed_point computed_error = two_to_n * (Ei - Fixed_point(1.0, Ei.getInteger_bits(), Ei.getFractional_bits()));
@@ -139,8 +141,9 @@ Fixed_point *BKM::bkm_range_reduced_log(Fixed_point x, Fixed_point l0, int itera
     if (x < boundary_low || x > boundary_high){
         Fixed_point k = this->get_k(x);
         int k_int = this->get_k_int(x);
+        printf("%d\n", k_int);
         Fixed_point x_dot = this->range_reduce(x, k_int);
-        result = bkm_2(x, l0, iterations);
+        result = bkm_2(x_dot, l0, iterations);
         Fixed_point log_2 = Fixed_point(log(2.0), x.getInteger_bits(), x.getFractional_bits());
         Fixed_point log_2_k = k*log_2;
         result[1] = result[1] + log_2_k;
@@ -160,7 +163,12 @@ Fixed_point BKM::get_k(Fixed_point x) {
 }
 
 Fixed_point BKM::range_reduce(Fixed_point x, int k) {
-    Fixed_point x_shifted = x >> k;
+    Fixed_point x_shifted = x;
+    if (k >= 0){
+        x_shifted = x_shifted >> k;
+    }else{
+        x_shifted = x_shifted << -k;
+    }
 
     return x_shifted;
 }

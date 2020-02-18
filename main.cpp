@@ -8,7 +8,7 @@
 #include "CORDIC.h"
 #include "BKM.h"
 #include "ELU_simulations.h"
-
+#include "BKM_simulations.h"
 
 using namespace std;
 
@@ -18,9 +18,9 @@ void operatorsTest();
 
 
 int main() {
-    Simulator *simulator = new ELU_simulations();
+    Simulator *simulator = new BKM_simulations();
 
-    simulator->perform_test();
+    simulator->perform_run();
 
 
 }
