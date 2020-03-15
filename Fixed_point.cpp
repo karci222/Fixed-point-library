@@ -251,7 +251,7 @@ bool Fixed_point::operator==(const Fixed_point &number) const {
 int Fixed_point::getLeadingOnes() {
     double number_double = (double) this->number;
     double number_log = log2(number_double);
-    printf("%f\n", number_log);
+    //printf("%f\n", number_log);
     int leading_zeros = (int) floor(number_log);
     return leading_zeros;
 }

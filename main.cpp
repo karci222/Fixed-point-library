@@ -20,7 +20,14 @@ void operatorsTest();
 int main() {
     Simulator *simulator = new BKM_simulations();
 
+    //BKM bkm_16(7, 8);
+    //BKM bkm_32(7, 31-7);
+
+    //Fixed_point *result_16 = bkm_16.bkm_range_reduced(Fixed_point(0.0, 8, 7), Fixed_point(1.0, 8, 7), 8);
+    //Fixed_point32 *result_32 = bkm_32.bkm_range_reduced(Fixed_point32(0.0, 31-7, 7), Fixed_point32(1.0, 31-7, 7), 8);
     simulator->perform_run();
+    //cout<<result_16->getNumber()<<endl;
+    //cout<<result_32->getNumber()<<endl;
 
 
 }

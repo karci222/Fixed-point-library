@@ -115,6 +115,14 @@ Fixed_point32 Fixed_point32::operator>>(const int &shiftr) const {
 }
 
 Fixed_point32 Fixed_point32::operator-(const Fixed_point32 &fxp) const {
+    if (this->fractional_bits != fxp.fractional_bits || this->integer_bits != fxp.integer_bits){
+        printf("Wrong sizes! Numbers: %f\t %f\nInteger parts: %u\t %u\nFractional parts: %u\t %u\n", this->getDoubleValue(),
+               fxp.getDoubleValue(),
+               this->integer_bits,
+               fxp.getInteger_bits(),
+               this->fractional_bits,
+               fxp.getFractional_bits());
+    }
     uint32_t op1 = this->number;
     uint32_t op2;
     if ((this->getFractional_bits() != fxp.getFractional_bits()) || (this->getInteger_bits() != fxp.getInteger_bits())){
@@ -123,7 +131,7 @@ Fixed_point32 Fixed_point32::operator-(const Fixed_point32 &fxp) const {
         op2 = fxp.getNumber();
     }
 
-    op2 ^= 0xffff;
+    op2 ^= 0xffffffff;
     op2 += 1;
 
     uint32_t result = op1 + op2;
@@ -131,6 +139,14 @@ Fixed_point32 Fixed_point32::operator-(const Fixed_point32 &fxp) const {
 }
 
 Fixed_point32 Fixed_point32::operator+(const Fixed_point32 &fxp) const {
+    if (this->fractional_bits != fxp.fractional_bits || this->integer_bits != fxp.integer_bits){
+        printf("Wrong sizes! Numbers: %f\t %f\nInteger parts: %u\t %u\nFractional parts: %u\t %u\n", this->getDoubleValue(),
+               fxp.getDoubleValue(),
+               this->integer_bits,
+               fxp.getInteger_bits(),
+               this->fractional_bits,
+               fxp.getFractional_bits());
+    }
     uint32_t op1 = this->number;
     uint32_t op2;
     if ((this->getFractional_bits() != fxp.getFractional_bits()) || (this->getInteger_bits() != fxp.getInteger_bits())){
@@ -206,15 +222,15 @@ uint32_t Fixed_point32::getFractional_bits() const {
     return fractional_bits;
 }
 
-void Fixed_point32::setFractional_bits(uint16_t fractional_bits) {
+void Fixed_point32::setFractional_bits(uint32_t fractional_bits) {
     Fixed_point32::fractional_bits = fractional_bits;
 }
 
-double Fixed_point::largestNum() {
-    return (double )((1<<15)-1)/(double )(1 << this->fractional_bits);
+double Fixed_point32::largestNum() {
+    return (double )((uint32_t)(1<<31)-1)/(double )(1 << this->fractional_bits);
 }
 
-Fixed_point Fixed_point::operator*(const Fixed_point &fxp) const {
+Fixed_point32 Fixed_point32::operator*(const Fixed_point32 &fxp) const {
     uint32_t op1, op2;
     uint32_t mask = 0xffff0000;
 
@@ -229,18 +245,18 @@ Fixed_point Fixed_point::operator*(const Fixed_point &fxp) const {
         result += 1;
     }
 
-    return Fixed_point((uint16_t) result, this->integer_bits, this->fractional_bits);
+    return Fixed_point32(result, this->integer_bits, this->fractional_bits);
 }
 
-bool Fixed_point::operator<=(const Fixed_point &number) const {
+bool Fixed_point32::operator<=(const Fixed_point32 &number) const {
     return *this < number || *this == number;
 }
 
-bool Fixed_point::operator>=(const Fixed_point &number) const {
+bool Fixed_point32::operator>=(const Fixed_point32 &number) const {
     return *this > number || *this == number;
 }
 
-bool Fixed_point::operator==(const Fixed_point &number) const {
+bool Fixed_point32::operator==(const Fixed_point32 &number) const {
     if ((this->getFractional_bits() != number.getFractional_bits()) || (this->getInteger_bits() != number.getInteger_bits())){
         printf("Wrong sizes! Numbers: %f\t %f\nInteger parts: %u\t %u\nFractional parts: %u\t %u\n", this->getDoubleValue(),
                number.getDoubleValue(),
@@ -252,10 +268,10 @@ bool Fixed_point::operator==(const Fixed_point &number) const {
     return this->getNumber() == number.getNumber();
 }
 
-int Fixed_point::getLeadingOnes() {
+int Fixed_point32::getLeadingOnes() {
     double number_double = (double) this->number;
     double number_log = log2(number_double);
-    printf("%f\n", number_log);
+    //printf("%f\n", number_log);
     int leading_zeros = (int) floor(number_log);
     return leading_zeros;
 }

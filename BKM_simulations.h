@@ -16,11 +16,16 @@ class BKM_simulations : public Simulator{
 public:
     void perform_run() override;
     void perform_test() override;
+
     void runBKM_exp(uint16_t fractional_bits);
     void runBKM_log(uint16_t fractional_bits);
+    void runBKM_exp32(uint16_t fractional_bits);
+    void runBKM_log32(uint16_t fractional_bits);
 
     void testBKM_exp(uint16_t fractional_bits, bool writeFile);
     void testBKM_log(uint16_t fractional_bits, bool writeFile);
+    void testBKM_exp32(uint16_t fractional_bits, bool writeFile);
+    void testBKM_log32(uint16_t fractional_bits, bool writeFile);
 };
 
 
